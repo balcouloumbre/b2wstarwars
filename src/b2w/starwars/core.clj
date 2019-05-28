@@ -9,11 +9,6 @@
   {:pre [(not (str/blank? name))]}
   (NewPlanet. name climate terrain))
 
-(defn create-persisted-planet
-  [id name climate terrain]
-  {:pre [(not (str/blank? name))]}
-  (PersistedPlanet. id name climate terrain))
-
-(defn update-planet
-  [p name climate terrain]
-  (PersistedPlanet. (get p :id) name climate terrain))
+(defn add-films-to-planet
+  [planet films]
+  (assoc planet :films films))

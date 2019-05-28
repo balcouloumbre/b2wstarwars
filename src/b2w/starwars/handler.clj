@@ -3,41 +3,7 @@
             [clj-http.client :as http]
             [ring.util.http-response :refer :all]
             [schema.core :as schema]
-            [b2w.starwars.core :as core]
-            [b2w.starwars.repository :as rep]))
-
-(defn get-planet-from-external-api
-  [name]
-  (let [response (http/get (str "https://swapi.co/api/planets/?search=" name))
-        body (cheshire.core/parse-string (:body response) true)]
-    (:results body)))
-
-(defn get-planet-film-count
-  [name]
-  (let [result (get-planet-from-external-api name)]
-    (if (or (nil? result) (not= 1 (count result)))
-           0
-           (count ((first result) :films)))))
-
-(defn remove-by-id
-  [id]
-  (ok (rep/delete-planet id)))
-
-(defn add-film-count
-  [planet]
-  (assoc planet :films (get-planet-film-count(planet :name))))
-
-(defn find-by-id
-  [id]
-  (let [planet (rep/find-planet id)]
-    (if(not(nil? planet))
-      (ok (add-film-count planet))
-      (not-found))))
-
-(defn create-planet
-  [planet]
-  (rep/insert-planet
-      (core/create-new-planet (planet :name) (planet :climate) (planet :terrain))))
+            [b2w.starwars.service :as service]))
 
 (schema/defschema Planet
              {:id schema/Str
@@ -65,18 +31,16 @@
       (GET "/planets/:id" [id]
         :return Planet
         :summary "Gets a planet with that Id"
-        (find-by-id id))
+        (let [planet (service/find-by-id id)]
+                      (if(nil? planet)
+                        not-found
+                        (ok planet))))
       (DELETE "/planets/:id" [id]
         :summary "Removes a planet with that Id"
-        (remove-by-id id))
+        (ok (service/remove-by-id id)))
       (POST "/planets" []
         :return Planet
         :body [planet NewPlanet]
         :summary "Creates a new planet"
-        (ok (create-planet planet)))
+        (ok (service/create-planet planet)))
       )))
-
-
-
-
-
