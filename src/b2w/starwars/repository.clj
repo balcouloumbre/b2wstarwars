@@ -44,6 +44,12 @@
         mongo   (mg/get-db conn db)]
     (db-planet->domain-planet (mc/find-map-by-id mongo coll (ObjectId. id)))))
 
+(defn list-records
+  [db coll max]
+  (let [conn (mg/connect)
+         mongo   (mg/get-db conn db)]
+    (map db-planet->domain-planet (take max (mc/find-maps mongo coll)))))
+
 (defrecord mongo-planet-repository [db coll]
   core/planet-repository
   (insert-planet
@@ -57,4 +63,7 @@
     (update-record db coll planet))
   (find-planet
     [this id]
-    (find-by-id db coll id)))
+    (find-by-id db coll id))
+  (list-planets
+  [this max]
+  (list-records db coll max)))

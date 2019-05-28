@@ -6,7 +6,7 @@
 ;; Using localhost, default port. And leaving the database and collection hardcoded for now.
 (def mongo-rep (rep/->mongo-planet-repository "b2wstarwars" "Planets"))
 
-(defn remove-by-id
+(defn delete-planet
   [id]
   (core/delete-planet mongo-rep id))
 
@@ -38,10 +38,16 @@
   [planet]
   (core/add-films-to-planet planet (count (get-films-from-external-api-memo(planet :name)))))
 
-(defn find-by-id
+(defn find-planet
   [id]
   (let [planet (core/find-planet mongo-rep id)]
     (if(not(nil? planet))
       (add-film-count planet))))
-      ;(hash-map :id "" :name "" :climate "" :terrain "" :films 0))))
+
+(defn list-planets
+  []
+  (map
+    (fn [planet] (add-film-count planet))
+      (core/list-planets mongo-rep 30)))
+
 

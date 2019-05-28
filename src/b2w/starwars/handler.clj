@@ -28,16 +28,19 @@
 
     (context "/api" []
       :tags ["api"]
+      (GET "/planets/" []
+        :summary "List planets."
+        (ok (service/list-planets)))
       (GET "/planets/:id" [id]
         :return (schema/maybe Planet)
         :summary "Gets a planet with that Id"
-        (let [planet (service/find-by-id id)]
+        (let [planet (service/find-planet id)]
                       (if(nil? planet)
                         (not-found)
                         (ok planet))))
       (DELETE "/planets/:id" [id]
         :summary "Removes a planet with that Id"
-        (service/remove-by-id id)
+        (service/delete-planet id)
         (ok "Success!"))
       (PUT "/planets/" []
         :body [planet Planet]

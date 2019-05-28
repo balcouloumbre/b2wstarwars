@@ -2,10 +2,11 @@
   (:require [clojure.string :as str]))
 
 (defprotocol planet-repository "Protocol for a planet repository"
-  (insert-planet [this planet] "inserts a new planet into the db")
-  (update-planet [this planet] "updates an existing planet with new data")
-  (delete-planet [this id] "deletes a planet with a given id")
-  (find-planet [this id] "finds a planet with a given id"))
+  (insert-planet [this planet] "Inserts a new planet into the db")
+  (update-planet [this planet] "Updates an existing planet with new data")
+  (delete-planet [this id] "Deletes a planet with a given id")
+  (find-planet [this id] "Finds a planet with a given id")
+  (list-planets [this max] "Lists all planets"))
 
 (defrecord NewPlanet [name climate terrain])
 (defrecord PersistedPlanet [id name climate terrain])
