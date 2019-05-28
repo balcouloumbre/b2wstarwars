@@ -35,8 +35,8 @@
 [db coll planet]
 (let [conn (mg/connect)
       mongo   (mg/get-db conn db)
-      db-planet (domain-planet->db-planet(planet))]
-  (mc/update-by-id mongo coll (get db-planet :_id) db-planet)))
+      db-planet (domain-planet->db-planet planet)]
+  (mc/update-by-id mongo coll (db-planet :_id) db-planet)))
 
 (defn find-by-id
   [db coll id]

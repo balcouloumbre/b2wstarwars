@@ -10,37 +10,38 @@
   [id]
   (core/delete-planet mongo-rep id))
 
-(defn get-planet-from-external-api
+(defn get-films-from-external-api
   [name]
-  (-> (http/get (str "https://swapi.co/api/planets/?search=" name))
+  (let [external-planets (-> (http/get (str "https://swapi.co/api/planets/?search=" name))
       :body
       (cheshire.core/parse-string true)
-      :results))
+      :results)]
+      (if (or (nil? external-planets) (not= 1 (count external-planets)))
+        []
+        ((first external-planets) :films))))
 
 ;Memoize approach for caching SWAPI planets. Fast and easy, but since an external API isn't pure or transparent
 ;Would have been a better idea to store those results in an external cache like Redis, with an expiration timer.
-(def get-planet-from-external-api-memo
-  (memoize get-planet-from-external-api ))
-
-(defn get-planet-film-count
-  [name]
-  (let [result (get-planet-from-external-api-memo name)]
-    (if (or (nil? result) (not= 1 (count result)))
-      0
-      (count ((first result) :films)))))
+(def get-films-from-external-api-memo
+  (memoize get-films-from-external-api))
 
 (defn create-planet
   [planet]
   (core/insert-planet mongo-rep
     (core/create-new-planet (planet :name) (planet :climate) (planet :terrain))))
 
+(defn update-planet
+  [planet]
+  (core/update-planet mongo-rep planet))
+
 (defn add-film-count
   [planet]
-  (core/add-films-to-planet planet (get-planet-film-count(planet :name))))
+  (core/add-films-to-planet planet (count (get-films-from-external-api-memo(planet :name)))))
 
 (defn find-by-id
   [id]
   (let [planet (core/find-planet mongo-rep id)]
     (if(not(nil? planet))
       (add-film-count planet))))
+      ;(hash-map :id "" :name "" :climate "" :terrain "" :films 0))))
 
