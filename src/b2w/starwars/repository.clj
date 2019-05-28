@@ -21,24 +21,24 @@
 (defrecord mongo-planet-repository [db coll]
   core/planet-repository
   (insert-planet
-    [planet]
+    [this planet]
     (let [conn (mg/connect)
           mongo   (mg/get-db conn db)]
       (db-planet->domain-planet
         (mc/insert-and-return mongo coll planet))))
   (delete-planet
-    [id]
+    [this id]
     (let [conn (mg/connect)
           mongo   (mg/get-db conn db)]
       (mc/remove-by-id mongo coll (ObjectId. id))))
   (update-planet
-    [planet]
+    [this planet]
     (let [conn (mg/connect)
           mongo   (mg/get-db conn db)
           db-planet (domain-planet->db-planet(planet))]
       (mc/update-by-id mongo coll (get db-planet :_id) db-planet)))
   (find-planet
-    [id]
+    [this id]
     (let [conn (mg/connect)
           mongo   (mg/get-db conn db)]
       (db-planet->domain-planet (mc/find-map-by-id mongo coll (ObjectId. id))))))

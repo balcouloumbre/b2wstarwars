@@ -8,7 +8,7 @@
 
 (defn remove-by-id
   [id]
-  (delete-planet mongo-rep id))
+  (core/delete-planet mongo-rep id))
 
 (defn get-planet-from-external-api
   [name]
@@ -31,7 +31,7 @@
 
 (defn create-planet
   [planet]
-  (insert-planet mongo-rep
+  (core/insert-planet mongo-rep
     (core/create-new-planet (planet :name) (planet :climate) (planet :terrain))))
 
 (defn add-film-count
@@ -40,7 +40,7 @@
 
 (defn find-by-id
   [id]
-  (let [planet (find-planet mongo-rep id)]
+  (let [planet (core/find-planet mongo-rep id)]
     (if(not(nil? planet))
       (add-film-count planet))))
 
