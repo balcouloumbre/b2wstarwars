@@ -3,9 +3,12 @@
             [b2w.starwars.core :as core]
             [clj-http.client :as http]))
 
+;; Using localhost, default port. And leaving the database and collection hardcoded for now.
+(def mongo-rep (rep/->mongo-planet-repository "b2wstarwars" "Planets"))
+
 (defn remove-by-id
   [id]
-  (rep/delete-planet id))
+  (delete-planet mongo-rep id))
 
 (defn get-planet-from-external-api
   [name]
@@ -28,7 +31,7 @@
 
 (defn create-planet
   [planet]
-  (rep/insert-planet
+  (insert-planet mongo-rep
     (core/create-new-planet (planet :name) (planet :climate) (planet :terrain))))
 
 (defn add-film-count
@@ -37,7 +40,7 @@
 
 (defn find-by-id
   [id]
-  (let [planet (rep/find-planet id)]
+  (let [planet (find-planet mongo-rep id)]
     (if(not(nil? planet))
       (add-film-count planet))))
 
