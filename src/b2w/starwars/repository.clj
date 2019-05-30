@@ -65,5 +65,5 @@
     [this id]
     (find-by-id db coll id))
   (list-planets
-  [this max]
-  (list-records db coll max)))
+    [this max]
+    (list-records db coll max)))
